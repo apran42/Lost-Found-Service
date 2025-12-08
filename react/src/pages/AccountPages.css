@@ -1,0 +1,94 @@
+.account-page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: "Pretendard", sans-serif;
+  padding: 80px 24px 120px;
+  box-sizing: border-box;
+}
+
+.account-form-container {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.account-title {
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 40px;
+  font-weight: bold;
+}
+
+.account-field {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.account-field label {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.account-field input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.account-error {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #ff4e4e;
+}
+
+.account-success {
+  margin: 10px 0;
+  font-size: 14px;
+  color: #1a8f3e;
+}
+
+.account-submit-btn {
+  width: 100%;
+  padding: 13px;
+  background: #2822E9;
+  color: #fff;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.account-submit-btn.danger {
+  background: #2822E9;
+}
+
+.withdraw-desc {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+/* 반응형 */
+@media (max-width: 480px) {
+  .account-title {
+    font-size: 22px;
+    margin-bottom: 32px;
+  }
+
+  .account-field input {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .account-submit-btn {
+    padding: 11px;
+    font-size: 14px;
+  }
+} 
