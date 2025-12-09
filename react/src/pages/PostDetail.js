@@ -1,28 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./PostDetail.css";
+import api from "../api/api";
 
 function PostDetail() {
-  const { id } = useParams();
   const navigate = useNavigate();
 
+  const { id } = useParams();
+  const [post, setPost] = useState(null);
+  const [error, setError] = useState(null);
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [openCommentMenu, setOpenCommentMenu] = useState(null);
 
-  const post = {
-    id,
-    title: "에어팟을 잃어버린 물품을 찾습니다.",
-    type: "분실물",
-    writer: "황지원",
-    date: "2025.10.01",
-    views: 38,
-    place: "3호관",
-    category: "에어팟",
-    content:
-      "10월 2일에 에어팟을 학교에서 분실했습니다.\n3호관에서 주웠다는 분을 찾고 있습니다.\n혹시 보시면 연락 부탁드립니다!",
-    image:
-      "https://cdn.pixabay.com/photo/2019/11/21/03/46/airpods-4648460_1280.jpg",
-  };
+    useEffect(() => {
+        if(!id) return;
+        api.get(`/posts/post/${id}`)
+            .then(res => {
+                setPost(res.data);
+            console.log(res.data);
+            })
+        .catch(e => {
+            setError("게시물 로딩에 실했습니다.");
+        })
+    }, [id]);
 
   const comments = [
     {
@@ -39,15 +39,17 @@ function PostDetail() {
     },
   ];
 
+
   return (
+    (
     <div className="detail-wrapper">
       <div className="detail-box">
-        <h2 className="detail-top-title">{post.type} 글 게시판</h2>
+        <h2 className="detail-top-title">{post?.type} 글 게시판</h2>
 
         <div className="detail-section">
           {/* 글 상단 */}
           <div className="detail-header">
-            <h2>{post.title}</h2>
+            <h2>{post?.title}</h2>
 
             {/* 드롭다운 버튼 */}
             <div className="dropdown-wrapper">
@@ -69,17 +71,17 @@ function PostDetail() {
 
           {/* 글 정보 */}
           <div className="detail-info">
-            <span>{post.type}</span> | <span>{post.date}</span> |{" "}
-            <span>조회 {post.views}</span> | <span>{post.writer}</span>
+            <span>{post?.type}</span> | <span>{post?.date}</span> |{" "}
+            <span>조회 {post?.view}</span> | <span>{post?.writer}</span>
           </div>
 
           {/* 이미지 */}
           <div className="detail-img-box">
-            <img src={post.image} alt="사진" />
+            <img src={post?.image} alt="사진" />
           </div>
 
           {/* 내용 */}
-          <div className="detail-content">{post.content}</div>
+          <div className="detail-content">{post?.content}</div>
 
           {/* 응원하기 + 목록 + 채팅 */}
           <div className="detail-bottom-btns">
@@ -141,6 +143,7 @@ function PostDetail() {
         </div>
       </div>
     </div>
+    )
   );
 }
 

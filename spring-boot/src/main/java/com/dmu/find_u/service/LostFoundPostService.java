@@ -6,9 +6,15 @@ import com.dmu.find_u.entity.UserInfo;
 import com.dmu.find_u.repository.LostFoundPostRepository;
 import com.dmu.find_u.repository.PostLikeRepository;
 import com.dmu.find_u.repository.UserInfoRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,28 +29,50 @@ public class LostFoundPostService {
     private final PostLikeRepository likeRepository;
     // 내가 올린 게시물
     public List<Map<String, Object>> getPostsByUser(Long userId) {
-        return postRepository.findByUserId(userId)
-                .stream()
-                .map(this::postToDto)
-                .toList();
+        List<LostFoundPost> posts = postRepository.findByUserId(userId);
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (LostFoundPost p : posts) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", p.getId());
+            map.put("title", p.getTitle());
+            map.put("content", p.getContent());
+            map.put("type", p.getType());
+            map.put("date", p.getCreatedAt() != null ? p.getCreatedAt().toLocalDate().toString() : null);
+            map.put("writer", p.getWriter() != null ? p.getWriter().getName() : "알 수 없음");
+            map.put("image", p.getImageUrl());
+            map.put("place", p.getPlace() != null ? p.getPlace().getName() : null);
+            map.put("category", p.getCategory() != null ? p.getCategory().getName() : null);
+            map.put("likeCount", p.getLikeCount());
+
+            result.add(map);
+        }
+
+        return result;
     }
-    // 분실/습득 으로 구분한 게시물(내가 올린 것중)
+
+    // 분실/습득으로 구분한 게시물
     public List<Map<String, Object>> getPostsByUserAndType(Long userId, String type) {
-        return postRepository.findByUserIdAndType(userId, type)
-                .stream()
-                .map(this::postToDto)
-                .toList();
-    }
-    private Map<String, Object> postToDto(LostFoundPost post) {
-        Map<String, Object> dto = new HashMap<>();
-        dto.put("id", post.getId());
-        dto.put("date", post.getCreatedAt().toLocalDate().toString());
-        dto.put("type", post.getType());
-        dto.put("title", post.getTitle());
-        dto.put("placeId", post.getPlaceId());
-        dto.put("categoryId", post.getCategoryId());
-        dto.put("writerId", post.getUserId());
-        return dto;
+        List<LostFoundPost> posts = postRepository.findByUserIdAndType(userId, type);
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (LostFoundPost p : posts) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", p.getId());
+            map.put("title", p.getTitle());
+            map.put("content", p.getContent());
+            map.put("type", p.getType());
+            map.put("date", p.getCreatedAt() != null ? p.getCreatedAt().toLocalDate().toString() : null);
+            map.put("writer", p.getWriter() != null ? p.getWriter().getName() : "알 수 없음");
+            map.put("image", p.getImageUrl());
+            map.put("place", p.getPlace() != null ? p.getPlace().getName() : null);
+            map.put("category", p.getCategory() != null ? p.getCategory().getName() : null);
+            map.put("likeCount", p.getLikeCount());
+
+            result.add(map);
+        }
+
+        return result;
     }
 
     // 좋아요 추가
@@ -92,33 +120,67 @@ public class LostFoundPostService {
     }
 
     // 게시물 조회
-    public List<Map<String, Object>> getAllPosts(String type) {
+    public Page<Map<String, Object>> getAllPosts(String type, int page, int size,
+                                                 String sortBy, String place, String category,
+                                                 String startDate, String endDate) {
 
-        List<LostFoundPost> posts;
-        if (type != null) {
-            posts = postRepository.findByType(type.equals("lost") ? "분실": "습득");
-        } else {
-            posts = postRepository.findAll();
-        }
-        List<Map<String, Object>> result = new ArrayList<>();
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(sortBy != null ? sortBy : "createdAt").descending()
+        );
 
-        for (LostFoundPost p : posts) {
+        Page<LostFoundPost> posts = postRepository.findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (type != null) predicates.add(cb.equal(root.get("type"), type));
+            if (place != null) predicates.add(cb.equal(root.get("place").get("name"), place));
+            if (category != null) predicates.add(cb.equal(root.get("category").get("name"), category));
+            if (startDate != null && endDate != null) {
+                predicates.add(cb.between(
+                        root.get("createdAt"),
+                        LocalDate.parse(startDate).atStartOfDay(),
+                        LocalDate.parse(endDate).atTime(23,59,59)
+                ));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        }, pageable);
+
+        // Map 변환
+        return posts.map(p -> {
             Map<String, Object> map = new HashMap<>();
-
-            UserInfo writer = userInfoRepository.findById(p.getUserId())
-                    .orElse(null);
-
             map.put("id", p.getId());
-            map.put("date", p.getCreatedAt().toLocalDate().toString());
-            map.put("type", p.getType());
             map.put("title", p.getTitle());
+            map.put("type", p.getType());
+            map.put("date", p.getCreatedAt() != null ? p.getCreatedAt().toLocalDate().toString() : null);
+            map.put("writer", p.getWriter() != null ? p.getWriter().getName() : "알 수 없음");
+            map.put("image", p.getImageUrl());
+            map.put("content", p.getContent());
             map.put("place", p.getPlace() != null ? p.getPlace().getName() : null);
             map.put("category", p.getCategory() != null ? p.getCategory().getName() : null);
-            map.put("writer", writer != null ? writer.getName() : "알 수 없음");
+            map.put("likeCount", p.getLikeCount());
+            return map;
+        });
+    }
 
-            result.add(map);
-        }
 
-        return result;
+
+    // 게시물의 아이디를 기반으로 정보를 넘김
+    public Map<String, Object> getPostById(Long postId) {
+        LostFoundPost p = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("게시물이 존재하지 않습니다."));
+
+        Map<String, Object> map = new HashMap<>();
+        UserInfo writer = p.getWriter();
+        map.put("id", p.getId());
+        map.put("date", p.getCreatedAt() != null ? p.getCreatedAt().toLocalDate().toString() : null);
+        map.put("type", p.getType());
+        map.put("title", p.getTitle());
+        map.put("view", p.getViewCount() != null ? p.getViewCount() : 0);
+        map.put("writer", writer != null ? writer.getName() : "알 수 없음");
+        map.put("image", p.getImageUrl());
+        map.put("view", p.getViewCount() != null ? p.getViewCount() : 0);
+        map.put("content", p.getContent());
+
+        return map;
     }
 }

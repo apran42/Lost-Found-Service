@@ -1,5 +1,6 @@
 package com.dmu.find_u.entity;
 
+import com.dmu.find_u.entity.UserInfo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,9 +28,9 @@ public class LostFoundPost {
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
 
-    @Setter
-    @Getter
-    @Column(name = "user_id", nullable = false)
+
+
+    @Column(name = "user_id", nullable = false, insertable = false, updatable = false)
     private Long userId;
 
     @Setter
@@ -62,6 +63,11 @@ public class LostFoundPost {
     @Column(nullable = false)
     private String status; // 진행중/완료 등
 
+    @Setter
+    @Getter
+    @Column(name = "image")
+    private String imageUrl;
+
     @Getter
     @Setter
     @Column(name = "view_count", nullable = false)
@@ -79,6 +85,15 @@ public class LostFoundPost {
     @JoinColumn(name = "place_id", insertable = false, updatable = false)
     private Place place;
 
+
+    @Getter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserInfo Writer;
+
+
+    @Getter
+    @Setter
     @Column(name = "like_count", nullable = false)
     private Integer likeCount = 0;
 

@@ -15,11 +15,10 @@ function MyPage() {
     const [myPosts, setMyPosts] = useState([]);
     const [myFoundPosts, setMyFoundPosts] = useState([]);
     const [myLostPosts, setMyLostPosts] = useState([]);
-
     // FAQ 열림/닫힘
   const [faqOpen, setFaqOpen] = useState(false);
     useEffect(() => {
-        if (!user) return;
+        if (loading || !user) return;
 
         // 1) 사용자 기본정보
         api.get("/user/profile")

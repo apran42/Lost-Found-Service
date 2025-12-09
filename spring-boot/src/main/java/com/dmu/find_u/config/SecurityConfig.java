@@ -26,8 +26,11 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())     // 개발 시 CSRF OFF
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
-
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/**").permitAll()
+                        .anyRequest().authenticated()
+                );
         return http.build();
     }
 

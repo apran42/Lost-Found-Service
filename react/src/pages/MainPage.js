@@ -9,6 +9,7 @@ import searchBtn from "../images/search-btn.png";
 function MainPage() {
     const [selectedCategory, setSelectedCategory] = useState("all");
 
+
     const [selectedTags, setSelectedTags] = useState([]);
     const tags = ["전자기기","악세사리","지갑","의류/잡화","필기구","텀블러","도서"];
 

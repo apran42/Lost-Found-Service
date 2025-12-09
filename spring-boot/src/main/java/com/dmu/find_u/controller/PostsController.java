@@ -1,9 +1,10 @@
 package com.dmu.find_u.controller;
 
 import com.dmu.find_u.entity.LostFoundPost;
+import com.dmu.find_u.repository.LostFoundPostRepository;
 import com.dmu.find_u.service.LostFoundPostService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Map;
 public class PostsController {
 
     private final LostFoundPostService postService;
+    private final LostFoundPostRepository lostFoundPostRepository;
 
     // 1) 내가 올린 게시물 전체
     @GetMapping("/my")
@@ -33,6 +35,13 @@ public class PostsController {
     @GetMapping("/my-lost")
     public List<Map<String, Object>> getMyLostPosts(@RequestParam Long userId) {
         return postService.getPostsByUserAndType(userId, "분실");
+    }
+
+    // 4) 게시물의 아이디를 기반으로 조회
+    @GetMapping("/post/{postId}")
+    public Map<String, Object> getPostById(@PathVariable Long postId) {
+        return postService.getPostById(postId);
+
     }
 
 }
