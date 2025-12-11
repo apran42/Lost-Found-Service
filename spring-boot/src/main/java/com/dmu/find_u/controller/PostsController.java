@@ -292,7 +292,7 @@ public class PostsController {
     public ResponseEntity<Map<String, Object>> uploadImage(@RequestParam("file") MultipartFile file) {
 
         String folder = "uploaded_images/";
-        String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename()+file.getContentType();
+        String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
         Path filepath = Paths.get(folder + filename);
 
         try {
