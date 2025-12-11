@@ -3,6 +3,9 @@ package com.dmu.find_u.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "user")
 @Getter
@@ -34,6 +37,9 @@ public class UserInfo {
     @ManyToOne
     @JoinColumn(name = "dept", referencedColumnName = "id", nullable = true)
     private Dept dept;
+
+    @OneToMany(mappedBy = "user")
+    private List<Comment> comments = new ArrayList<>();
 
 
 }

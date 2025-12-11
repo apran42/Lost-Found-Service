@@ -1,11 +1,15 @@
 package com.dmu.find_u.entity;
 
 import com.dmu.find_u.entity.UserInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "lost_found_post")
@@ -17,18 +21,6 @@ public class LostFoundPost {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Setter
-    @Getter
-    @Column(name = "place_id", nullable = false)
-    private Long placeId;
-
-    @Setter
-    @Getter
-    @Column(name = "category_id", nullable = false)
-    private Long categoryId;
-
-
 
     @Column(name = "user_id", nullable = false, insertable = false, updatable = false)
     private Long userId;
@@ -76,31 +68,37 @@ public class LostFoundPost {
     @Getter
     @Setter
     @ManyToOne
-    @JoinColumn(name = "category_id", insertable = false, updatable = false)
+    @JsonIgnore
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @Getter
     @Setter
     @ManyToOne
-    @JoinColumn(name = "place_id", insertable = false, updatable = false)
+    @JsonIgnore
+    @JoinColumn(name = "place_id")
     private Place place;
 
 
     @Getter
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Setter
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
     @JoinColumn(name = "user_id")
-    private UserInfo Writer;
 
+    private UserInfo Writer;
 
     @Getter
     @Setter
     @Column(name = "like_count", nullable = false)
     private Integer likeCount = 0;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Comment> comments = new ArrayList<>();
+
+
     // 기본 생성자
     public LostFoundPost() {}
-
-    public void setLikeCount(int count) {
-    }
 
 }

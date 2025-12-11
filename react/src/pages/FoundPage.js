@@ -23,19 +23,24 @@ function FoundPage() {
         fetchPosts();
     }, [currentPage, category, place, startDate, endDate]);
 
-    const fetchPosts = async () => {
+    useEffect(() => {
+        setCurrentPage(0);
+    }, [category, place, startDate, endDate]);
+
+    const fetchPosts = async (term = "") => {
         try {
             const params = {
-                type: "found", // 습득물
+                type: "습득", // 습득물
                 page: currentPage,
                 size,
-                category: category || undefined,
-                place: place || undefined,
-                startDate: startDate || undefined,
-                endDate: endDate || undefined,
+                ...(category && { category }),
+                ...(place && { place }),
+                ...(startDate && { startDate }),
+                ...(endDate && { endDate }),
+                ...(term && { searchTerm: term }),
             };
             const res = await api.get("/posts/list", {
-                params: { type: "found"},
+                params,
                 withCredentials: true
             });
             if (res.data.success) {
@@ -43,14 +48,15 @@ function FoundPage() {
                 setCurrentPage(res.data.currentPage);
                 setTotalPages(res.data.totalPages);
             }
+            console.log(res.data);
         } catch (err) {
             console.error("게시물 불러오기 실패", err);
         }
     };
 
-  const filteredPosts = posts.filter((post) =>
-    post.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // const filteredPosts = posts.filter((post) =>
+  //   post.title.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   return (
     <div className="board-container">
@@ -83,7 +89,6 @@ function FoundPage() {
             <option value="6">6호관</option>
             <option value="7">7호관</option>
             <option value="8">8호관</option>
-
           </select>
             <div className="board-search-box">
               <input
@@ -92,7 +97,10 @@ function FoundPage() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <button onClick={() => fetchPosts()}><img src={searchIcon} alt="검색"/></button>
+              <button onClick={() => {
+                  setCurrentPage(0);
+                  fetchPosts(searchTerm);
+              }}><img src={searchIcon} alt="검색"/></button>
             </div>
           <Link to="/writepage" className="write-btn">글쓰기</Link>
         </div>
@@ -111,7 +119,7 @@ function FoundPage() {
           </tr>
         </thead>
         <tbody>
-          {filteredPosts.map((post) => (
+          {posts.map((post) => (
             <tr key={post.id} onClick={() => navigate(`/post/${post.id}`)}>
               <td>{post.id}</td>
               <td>{post.date}</td>

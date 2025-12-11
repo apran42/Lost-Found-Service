@@ -161,7 +161,11 @@ function Section({ title, posts, showType }) {
               <td>{p.id}</td>
               <td>{p.date}</td>
               {showType && <td>{p.type}</td>}
-              <td className="title">{p.title}</td>
+                <td
+                    className="title"
+                    onClick={() => navigate(`/post/${p.id}`)}
+                    style={{ cursor: "pointer" }}
+                >{p.title}</td>
               <td>{p.place}</td>
               <td>{p.category}</td>
               <td>{p.writer}</td>

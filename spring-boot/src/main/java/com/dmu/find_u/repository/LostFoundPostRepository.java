@@ -31,4 +31,7 @@ public interface LostFoundPostRepository extends JpaRepository<LostFoundPost, Lo
     List<LostFoundPost> findByType(String type);
 
 
+    // 상위 4개만 가져오기
+    List<LostFoundPost> findTop4ByOrderByLikeCountDesc();
+
 }

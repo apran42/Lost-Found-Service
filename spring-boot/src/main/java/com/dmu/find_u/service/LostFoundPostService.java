@@ -7,6 +7,7 @@ import com.dmu.find_u.repository.LostFoundPostRepository;
 import com.dmu.find_u.repository.PostLikeRepository;
 import com.dmu.find_u.repository.UserInfoRepository;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,11 +23,13 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor // final 필드를 생성자로 주입
+@Transactional
 public class LostFoundPostService {
 
     private final UserInfoRepository userInfoRepository;
     private final LostFoundPostRepository postRepository; // final로 선언
     private final PostLikeRepository likeRepository;
+    private final PostLikeService  postLikeService;
     // 내가 올린 게시물
     public List<Map<String, Object>> getPostsByUser(Long userId) {
         List<LostFoundPost> posts = postRepository.findByUserId(userId);
@@ -121,20 +124,20 @@ public class LostFoundPostService {
 
     // 게시물 조회
     public Page<Map<String, Object>> getAllPosts(String type, int page, int size,
-                                                 String sortBy, String place, String category,
+                                                 String searchTerm, String place, String category,
                                                  String startDate, String endDate) {
 
         Pageable pageable = PageRequest.of(
                 page,
                 size,
-                Sort.by(sortBy != null ? sortBy : "createdAt").descending()
+                Sort.by("createdAt").descending()
         );
 
         Page<LostFoundPost> posts = postRepository.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (type != null) predicates.add(cb.equal(root.get("type"), type));
-            if (place != null) predicates.add(cb.equal(root.get("place").get("name"), place));
-            if (category != null) predicates.add(cb.equal(root.get("category").get("name"), category));
+            if (place != null) predicates.add(cb.equal(root.get("place").get("id"), Long.parseLong(place)));
+            if (category != null) predicates.add(cb.equal(root.get("category").get("id"), Long.parseLong(category)));
             if (startDate != null && endDate != null) {
                 predicates.add(cb.between(
                         root.get("createdAt"),
@@ -142,6 +145,10 @@ public class LostFoundPostService {
                         LocalDate.parse(endDate).atTime(23,59,59)
                 ));
             }
+            if (searchTerm != null && !searchTerm.isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("title")), "%" + searchTerm.toLowerCase() + "%"));
+            }
+
             return cb.and(predicates.toArray(new Predicate[0]));
         }, pageable);
 
@@ -165,21 +172,31 @@ public class LostFoundPostService {
 
 
     // 게시물의 아이디를 기반으로 정보를 넘김
-    public Map<String, Object> getPostById(Long postId) {
-        LostFoundPost p = postRepository.findById(postId)
+    public Map<String, Object> getPostById(Long postId, UserInfo loginUser) {
+        LostFoundPost post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("게시물이 존재하지 않습니다."));
 
+        // 조회수 증가
+        post.setViewCount(post.getViewCount() + 1);
+        postRepository.save(post);
+
         Map<String, Object> map = new HashMap<>();
-        UserInfo writer = p.getWriter();
-        map.put("id", p.getId());
-        map.put("date", p.getCreatedAt() != null ? p.getCreatedAt().toLocalDate().toString() : null);
-        map.put("type", p.getType());
-        map.put("title", p.getTitle());
-        map.put("view", p.getViewCount() != null ? p.getViewCount() : 0);
-        map.put("writer", writer != null ? writer.getName() : "알 수 없음");
-        map.put("image", p.getImageUrl());
-        map.put("view", p.getViewCount() != null ? p.getViewCount() : 0);
-        map.put("content", p.getContent());
+        map.put("id", post.getId());
+        map.put("title", post.getTitle());
+        map.put("content", post.getContent());
+        map.put("type", post.getType());
+        map.put("date", post.getCreatedAt() != null ? post.getCreatedAt().toLocalDate().toString() : null);
+        map.put("view", post.getViewCount());
+        map.put("writer", post.getWriter() != null ? post.getWriter().getName() : "알 수 없음");
+        map.put("writerId", post.getWriter() != null ? post.getWriter().getId() : null);
+        map.put("image", post.getImageUrl());
+        map.put("categoryId", post.getCategory() != null ? post.getCategory().getId() : null);
+        map.put("placeId", post.getPlace() != null ? post.getPlace().getId() : null);
+        map.put("likeCount", post.getLikeCount());
+
+        // 현재 유저가 좋아요 눌렀는지
+        boolean liked = loginUser != null && postLikeService.isLikedByUser(postId, loginUser.getId());
+        map.put("likedByCurrentUser", liked);
 
         return map;
     }

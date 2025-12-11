@@ -1,5 +1,6 @@
 package com.dmu.find_u.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -22,5 +23,6 @@ public class Category {
 
     // 연관 게시글
     @OneToMany(mappedBy = "category")
+    @JsonIgnore
     private List<LostFoundPost> posts;
 }

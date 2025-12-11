@@ -9,6 +9,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.crypto.spec.OAEPParameterSpec;
+import java.util.Optional;
+
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
     boolean existsByPostIdAndUserId(Long postId, Long userId);
@@ -33,5 +36,7 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
     boolean existsByPostAndUser(LostFoundPost post, UserInfo user);
 
     void deleteByPostAndUser(LostFoundPost post, UserInfo user);
+
+    Optional<PostLike> findByUserAndPost(UserInfo user, LostFoundPost post);
 }
 
