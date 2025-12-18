@@ -150,8 +150,6 @@ public class PostsController {
         return ResponseEntity.ok(response);
     }
 
-
-
     // 게시물 수정
     @PutMapping("/updatePost/{postId}")
     public ResponseEntity<?> updatePost(

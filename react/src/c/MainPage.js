@@ -20,8 +20,8 @@ function MainPage() {
       <div className="main-buttons">
         <Link to="/lost" className="big-btn">
           <div class="flex">
-          <h3>분실했어요!</h3>
-          <p>최근 분실물 게시판으로 이동합니다.</p>
+            <h3>분실했어요!</h3>
+            <p>최근 분실물 게시판으로 이동합니다.</p>
           </div>
           <div class="arrow-container">
             <img src={ArrowIcon} alt="화살표" class="arrow-icon" />

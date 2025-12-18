@@ -177,7 +177,7 @@ public class LostFoundPostService {
                 .orElseThrow(() -> new RuntimeException("게시물이 존재하지 않습니다."));
 
         // 조회수 증가
-        post.setViewCount(post.getViewCount() + 1);
+        post.setViewCount(post.getViewCount()+1);
         postRepository.save(post);
 
         Map<String, Object> map = new HashMap<>();

@@ -45,7 +45,7 @@ function Signup() {
 
       // 오류 없음
       try {
-          const res = await api.post("http://localhost:8080/api/user/signup", {
+          const res = await api.post("/user/signup", {
               name: form.name,
               uid: form.id,
               password: form.password,

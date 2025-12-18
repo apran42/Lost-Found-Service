@@ -84,7 +84,15 @@ function PostDetail() {
                 setComments([res.data, ...comments]);
                 setNewComment("");
             })
-            .catch(() => alert("댓글 등록 실패"));
+            .catch(() =>
+            {
+                if (!loginUser) {
+                    alert("로그인이 필요합니다!");
+                    return;
+                }
+                alert("댓글 등록 실패");
+
+            })
     };
 
     // 댓글 수정 시작
