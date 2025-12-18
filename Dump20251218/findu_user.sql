@@ -1,0 +1,62 @@
+-- MySQL dump 10.13  Distrib 8.0.32, for Win64 (x86_64)
+--
+-- Host: 127.0.0.1    Database: findu
+-- ------------------------------------------------------
+-- Server version	8.0.32
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `user`
+--
+
+DROP TABLE IF EXISTS `user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `uid` varchar(255) NOT NULL,
+  `phone` varchar(255) NOT NULL,
+  `number` varchar(255) DEFAULT NULL,
+  `password` varchar(255) NOT NULL COMMENT '사용자의 비밀번호',
+  `dept` int DEFAULT NULL,
+  `heart` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  UNIQUE KEY `phone_UNIQUE` (`phone`),
+  UNIQUE KEY `uid_UNIQUE` (`uid`),
+  KEY `dept_idx` (`dept`),
+  CONSTRAINT `dept` FOREIGN KEY (`dept`) REFERENCES `dept` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='유저 테이블';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user`
+--
+
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (40,'테스트','test1','010-0000-0000',NULL,'$2a$10$PVUw3Jz681plBMfRR2HUiuF2.zaGR/jj8zaxTJMBvpsmEffl6Wtry',NULL,0),(41,'테스트2','test2','010-1111-1111',NULL,'$2a$10$w2XHn8300aJ.4U7rz9Z8Vu3bFnr6tpwEvjEtt0JaaX3TCVeUSpD0G',NULL,0),(42,'테스트3','test3','010-2222-2222',NULL,'$2a$10$fyeJiaWSKg0kG4rlPg3P7OxDpNNcyYbRJiA1DJGREo6jLhR87zKhm',NULL,0),(43,'테스트4','test4','010-3333-3333',NULL,'$2a$10$wYnY5lhKVGYnK3LCgjzJ7e5UQ5Sqtrs4kDtkfqSViPOeGWkUXt21O',NULL,0),(44,'User1','user1','010-0000-0001',NULL,'1234',NULL,0),(45,'User2','user2','010-0000-0002',NULL,'1234',NULL,0),(46,'User3','user3','010-0000-0003',NULL,'1234',NULL,0),(47,'User4','user4','010-0000-0004',NULL,'1234',NULL,0),(48,'User5','user5','010-0000-0005',NULL,'1234',NULL,0),(49,'User6','user6','010-0000-0006',NULL,'1234',NULL,0),(50,'User7','user7','010-0000-0007',NULL,'1234',NULL,0),(51,'User8','user8','010-0000-0008',NULL,'1234',NULL,0),(52,'User9','user9','010-0000-0009',NULL,'1234',NULL,0),(53,'User10','user10','010-0000-0010',NULL,'1234',NULL,0),(54,'User11','user11','010-0000-0011',NULL,'1234',NULL,0),(55,'User12','user12','010-0000-0012',NULL,'1234',NULL,0),(56,'User13','user13','010-0000-0013',NULL,'1234',NULL,0),(57,'User14','user14','010-0000-0014',NULL,'1234',NULL,0),(58,'User15','user15','010-0000-0015',NULL,'1234',NULL,0),(59,'테스터','test100','010-4242-4242',NULL,'$2a$10$cgTQaP9xatTDsn9pH4LQbet2XwK4PX4LkTpl4JIX1A8REP2hRGbT2',NULL,0);
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-12-18 13:50:55
